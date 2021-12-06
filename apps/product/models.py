@@ -14,7 +14,7 @@ class CoverCategory(models.Model):
 
 class CarsCategory(models.Model):
     car_name = models.CharField(max_length=50, verbose_name='Car name')
-    car_model = models.CharField(max_length=50, verbose_name='Car model')
+    car_model = models.CharField(max_length=50, blank=True, verbose_name='Car model')
 
     class Meta:
         verbose_name = 'Car category'

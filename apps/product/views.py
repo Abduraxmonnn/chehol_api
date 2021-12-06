@@ -6,7 +6,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, DestroyAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, DestroyAPIView, ListAPIView, UpdateAPIView
 # Project
 from .serializers import CoverCategorySerializer, CarsCategorySerializer, CoverSerializer
 from .models import CoverCategory, CarsCategory, Cover
@@ -60,7 +60,7 @@ class CoverCategoryDestroyAPIView(DestroyAPIView):
     queryset = CoverCategory.objects.all()
 
 
-class CarsCategoryCreateUpdateDestroyViewSet(ModelViewSet):
+class CarsCategoryCreateUpdateViewSet(ModelViewSet):
     serializer_class = CarsCategorySerializer
     queryset = CarsCategory.objects.all()
 
@@ -71,32 +71,34 @@ class CarsCategoryCreateUpdateDestroyViewSet(ModelViewSet):
         queryset = super().get_queryset()
         return queryset
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def perform_create(self, serializer):
-        serializer.save()
-
 
 class CarsCategoryListAPIView(ListAPIView):
-    serializer_class = CoverSerializer
-    queryset = Cover.objects.all().order_by('id')
+    serializer_class = CarsCategorySerializer
+    queryset = CarsCategory.objects.all().order_by('id')
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_fields = ['car_name', 'car_model']
     search_fields = ['car_name', 'car_model']
 
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset()
+        return queryset
+
 
 class CarsRetrieveAPIView(RetrieveAPIView):
-    serializer_class = CoverSerializer
-    queryset = Cover.objects.all()
+    serializer_class = CarsCategorySerializer
+    queryset = CarsCategory.objects.all()
 
     def retrieve(self, request, *args, **kwargs):
-        self.serializer_class = CoverSerializer
+        self.serializer_class = CarsCategorySerializer
         return super(CarsRetrieveAPIView, self).retrieve(request, *args, **kwargs)
+
+
+class CarsCategoryDestroyViewSet(ModelViewSet):
+    serializer_class = CarsCategorySerializer
+    queryset = CarsCategory.objects.all()
 
 
 class CoverCreateUpdateViewSet(ModelViewSet):
@@ -119,7 +121,7 @@ class CoverListViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filter_fields = ['car_name', 'cover', 'color']
     search_fields = ['car_name', 'cover', 'color']
-    ordering_fields = ['car_name', 'color', 'price']
+    ordering_fields = ['price', ]
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -131,6 +133,13 @@ class CoverListViewSet(ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset()
+        return queryset
 
 
 class CoverRetrieveAPIView(RetrieveAPIView):
