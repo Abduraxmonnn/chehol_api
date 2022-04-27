@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 
-from apps.product.models import CoverCategory, CarsCategory, Cover
+from product.models import CoverCategory, CarsCategory, Cover
 
 
 @admin.register(CoverCategory)

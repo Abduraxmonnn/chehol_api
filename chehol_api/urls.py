@@ -1,18 +1,13 @@
+from django.conf.urls import url, include
 from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/v1/product/', include('apps.product.urls')),
-    path('api/v2/news/', include('apps.news.urls')),
+    url('admin/', admin.site.urls),
+    url(r'^api/v1/product/', include(('product.urls', 'product'), namespace='product')),
+    url(r'^api/v1/news/', include(('news.urls', 'news'), namespace='news')),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# path('product/image/', include('product.urls')),
-# path('news/image/', include('news.urls')),
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
